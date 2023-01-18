@@ -1,0 +1,146 @@
+#include<LiquidCrystal.h>
+LiquidCrystal lcd(A5,A4,A3,A2,A1,A0);
+void setup()
+{
+   pinMode(13, OUTPUT);
+   pinMode(12, OUTPUT);
+   pinMode(11, OUTPUT);
+   pinMode(10, OUTPUT); 
+  
+   pinMode(9, INPUT_PULLUP);
+   pinMode(8, INPUT_PULLUP);
+   pinMode(7, INPUT_PULLUP);
+   pinMode(6, INPUT_PULLUP);
+ 
+  
+  Serial.begin(9600);
+  randomSeed(42); 
+  
+  //lcd
+  lcd.begin(16,2);
+  lcd.setCursor(0,0);
+  lcd.print("4Colours");
+  delay(1000);
+  lcd.setCursor(6,1);
+  lcd.print("Welcome^_^");
+  delay(2000);
+  lcd.clear();
+  successed();
+}
+int randomNumber,size=1,Highscore=0,life=16;
+int arr[250];
+bool S = true,btn1,btn2,btn3,btn4;
+void loop()
+{
+  Serial.println(size);
+  for(int i=0 ; i<size ;i++)
+  {
+  randomNumber = random(1,5);
+    arr[i]=randomNumber;
+    digitalWrite(randomNumber+9,HIGH);
+    delay(400);
+    digitalWrite(randomNumber+9,LOW);
+    delay(200);
+   
+    if(randomNumber==1)
+     Serial.println("Green");
+    
+	else if(randomNumber==2)
+     Serial.println("Yellow");
+      
+	else if(randomNumber==3)
+     Serial.println("Blue");
+      
+	else if(randomNumber==4)
+     Serial.println("Red");
+   
+  }
+  for(int i=0 ; i<size ;)
+  {
+    btn1=digitalRead(9);
+    btn2=digitalRead(8);
+    btn3=digitalRead(7);
+    btn4=digitalRead(6);
+    
+    if(arr[i]==1&&!btn1&&btn2&&btn3&&btn4)
+      i++;
+    else if(arr[i]==2&&btn1&&!btn2&&btn3&&btn4)
+      i++;
+    else if(arr[i]==3&&btn1&&btn2&&!btn3&&btn4)
+      i++;
+    else if(arr[i]==4&&btn1&&btn2&&btn3&&!btn4)
+      i++;
+ 	else if(btn1&&btn2&&btn3&&btn4)
+    {
+      continue;
+    }
+    else
+    {
+        life--;
+		if(life)
+        {
+          lifes();
+        }
+        else
+        {
+          S=false;
+        }
+      
+      break;
+    }
+    delay(100);
+  }
+  if(S)
+  {
+    Serial.println("Sucessed");
+    size++;
+    successed();
+  }
+  else
+  {
+    
+    Serial.println("Game over !");
+    size=1;
+    life=16;
+    S=true;
+    over();
+  }
+
+  
+}
+void successed()
+{
+  	lcd.clear();
+    lcd.print("Your Score: ");
+    lcd.print(size-1);
+    lcd.setCursor(0,1);
+    lcd.print("High Score: ");
+    if(size-1>Highscore)
+      Highscore=size-1;
+    lcd.print(Highscore);
+}
+void over()
+{
+    lcd.clear();
+    lcd.setCursor(3,0);
+    lcd.print("Game");
+     lcd.setCursor(8,1);
+    lcd.print("over !");
+    delay(1000);
+    successed();
+}
+void lifes()
+{
+	lcd.clear();
+  	for(int i=0 ; i<life ;i++)
+      lcd.print("#");
+ 	
+  lcd.setCursor(0,1);
+  lcd.print(" U 've a ");
+  lcd.print(life);
+  lcd.print(" life");
+  delay(1000);
+  size--;
+  successed();
+
+}
